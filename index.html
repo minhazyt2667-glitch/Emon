@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🥥 Coconut Farming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #111, #222);
+      color: #fff;
+      text-align: center;
+    }
+
+    .top {
+      padding: 15px;
+      background: #000;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .balance {
+      font-size: 26px;
+      margin-top: 10px;
+      color: #00ff88;
+    }
+
+    .tap-area {
+      margin-top: 30px;
+    }
+
+    .coconut {
+      font-size: 120px;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+
+    .coconut:active {
+      transform: scale(0.9);
+    }
+
+    .plus {
+      position: absolute;
+      color: gold;
+      font-size: 25px;
+      animation: fly 0.7s linear;
+    }
+
+    @keyframes fly {
+      from {opacity: 1; top: 50%;}
+      to {opacity: 0; top: 30%;}
+    }
+
+    .menu {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #000;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+    }
+
+    .menu button {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .box {
+      display: none;
+      position: fixed;
+      bottom: 60px;
+      width: 100%;
+      background: #111;
+      padding: 20px;
+      border-top: 2px solid #00ff88;
+    }
+
+    .shop-item {
+      background: #222;
+      padding: 10px;
+      margin: 10px;
+      border: 1px solid #00ff88;
+    }
+
+    a {
+      color: cyan;
+      text-decoration: none;
+      display: block;
+      margin: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top">🥥 Coconut Farming</div>
+  <div class="balance">Balance: <span id="coins">0</span> 🥥</div>
+
+  <div class="tap-area">
+    <div class="coconut" onclick="tap()">🥥</div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="box" id="shopBox">
+    <h3>🛒 Shop</h3>
+
+    <div class="shop-item">
+      +1 Per Tap (Cost: 50)
+      <br>
+      <button onclick="buyTap()">Buy</button>
+    </div>
+
+    <div class="shop-item">
+      Auto Farm (Cost: 200)
+      <br>
+      <button onclick="buyAuto()">Buy</button>
+    </div>
+  </div>
+
+  <!-- DAILY -->
+  <div class="box" id="dailyBox">
+    <h3>🎁 Daily Reward</h3>
+    <button onclick="dailyReward()">Claim 100 🥥</button>
+  </div>
+
+  <!-- SOCIAL -->
+  <div class="box" id="socialBox">
+    <h3>🌐 Follow Us</h3>
+    <a href="https://youtube.com" target="_blank">YouTube</a>
+    <a href="https://facebook.com" target="_blank">Facebook</a>
+    <a href="https://x.com" target="_blank">X (Twitter)</a>
+    <a href="https://instagram.com" target="_blank">Instagram</a>
+  </div>
+
+  <!-- ACCOUNT -->
+  <div class="box" id="accountBox">
+    <h3>⚠ Account</h3>
+    <button onclick="resetAccount()">❌ Delete Account</button>
+  </div>
+
+  <!-- MENU -->
+  <div class="menu">
+    <button onclick="openBox('shopBox')">Shop</button>
+    <button onclick="openBox('dailyBox')">Daily</button>
+    <button onclick="openBox('socialBox')">Social</button>
+    <button onclick="openBox('accountBox')">Account</button>
+  </div>
+
+  <script>
+    let coins = Number(localStorage.getItem("coins")) || 0;
+    let perTap = Number(localStorage.getItem("perTap")) || 1;
+    let auto = Number(localStorage.getItem("auto")) || 0;
+
+    document.getElementById("coins").innerText = coins;
+
+    function tap() {
+      coins += perTap;
+      save();
+
+      let p = document.createElement("div");
+      p.className = "plus";
+      p.innerText = "+" + perTap;
+      p.style.left = Math.random() * 80 + "%";
+      p.style.top = "50%";
+      document.body.appendChild(p);
+
+      setTimeout(() => p.remove(), 700);
+    }
+
+    function save() {
+      localStorage.setItem("coins", coins);
+      localStorage.setItem("perTap", perTap);
+      localStorage.setItem("auto", auto);
+      document.getElementById("coins").innerText = coins;
+    }
+
+    function buyTap() {
+      if (coins >= 50) {
+        coins -= 50;
+        perTap++;
+        save();
+      } else alert("Not enough 🥥");
+    }
+
+    function buyAuto() {
+      if (coins >= 200) {
+        coins -= 200;
+        auto++;
+        save();
+      } else alert("Not enough 🥥");
+    }
+
+    function dailyReward() {
+      let last = localStorage.getItem("daily") || 0;
+      let now = Date.now();
+
+      if (now - last > 86400000) {
+        coins += 100;
+        localStorage.setItem("daily", now);
+        save();
+        alert("✅ 100 🥥 Claimed!");
+      } else {
+        alert("⏳ Come back tomorrow");
+      }
+    }
+
+    function resetAccount() {
+      if (confirm("Delete your account?")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    function openBox(id) {
+      document.querySelectorAll(".box").forEach(box => box.style.display = "none");
+      document.getElementById(id).style.display = "block";
+    }
+
+    // Auto Farm System
+    setInterval(() => {
+      if (auto > 0) {
+        coins += auto;
+        save();
+      }
+    }, 1000);
+  </script>
+
+</body>
+</html>
